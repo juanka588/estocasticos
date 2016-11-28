@@ -3,15 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Data;
+package GUI;
+
+import Data.ServiceArea;
+import javax.swing.JPanel;
 
 /**
  *
  * @author JuanCamilo
  */
-public class Constants {
-
-    public static final int TECHNICAL_ASSITENCE = 0, QYR = 1, REQUEST = 2,
-            VELOCITY = 2, REDIRECT_COST = 3;
-
+public interface ServiceAreaListener {
+    public JPanel serviceClick(ServiceArea area);
 }

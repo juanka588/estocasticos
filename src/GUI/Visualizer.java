@@ -5,17 +5,27 @@
  */
 package GUI;
 
+import LN.Simulator;
+
 /**
  *
  * @author JuanCamilo
  */
 public class Visualizer extends javax.swing.JPanel {
 
+    private Simulator sim;
+    private ServiceAreaListener mServiceCallback;
+    private AgentListener mAgentCallback;
+
     /**
      * Creates new form Visualizer
      */
-    public Visualizer() {
+    public Visualizer(ServiceAreaListener mServiceCallback, AgentListener mAgentCallback) {
         initComponents();
+        sim = new Simulator();
+        sim.init();
+        this.mServiceCallback = mServiceCallback;
+        this.mAgentCallback = mAgentCallback;
     }
 
     /**
@@ -26,6 +36,8 @@ public class Visualizer extends javax.swing.JPanel {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+
+        setBackground(new java.awt.Color(255, 255, 255));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);

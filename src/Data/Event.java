@@ -9,14 +9,14 @@ package Data;
  *
  * @author JuanCamilo
  */
-public class Event {
-    
-    public static int CALL_IN=0,CALL_END=1;
+public class Event implements Comparable<Event> {
+
+    public static final int CALL_IN = 0, CALL_END = 1;
     private int type;
-    private long startTime;
+    private double startTime;
     private Call call;
 
-    public Event(int type, long startTime, Call call) {
+    public Event(int type, double startTime, Call call) {
         this.type = type;
         this.startTime = startTime;
         this.call = call;
@@ -30,11 +30,11 @@ public class Event {
         this.type = type;
     }
 
-    public long getStartTime() {
+    public double getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(long startTime) {
+    public void setStartTime(double startTime) {
         this.startTime = startTime;
     }
 
@@ -45,6 +45,24 @@ public class Event {
     public void setCall(Call call) {
         this.call = call;
     }
-    
-    
+
+    @Override
+    public int compareTo(Event o) {
+        return Double.compare(startTime, o.startTime);
+    }
+
+    @Override
+    public String toString() {
+        String typeS = "";
+        switch (type) {
+            case CALL_IN:
+                typeS = "call in";
+                break;
+            case CALL_END:
+                typeS = "call end";
+                break;
+        }
+        return "type: " + typeS + " call " + call.toString() + " time: " + startTime;
+    }
+
 }

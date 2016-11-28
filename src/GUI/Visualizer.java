@@ -5,7 +5,19 @@
  */
 package GUI;
 
+import Data.Agent;
+import Data.Constants;
+import static Data.Constants.AREA_COLOR;
+import static Data.Constants.BOT_COLOR;
+import static Data.Constants.BOT_SIZE;
+import Data.ServiceArea;
 import LN.Simulator;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import javax.swing.JButton;
 
 /**
  *
@@ -16,6 +28,8 @@ public class Visualizer extends javax.swing.JPanel {
     private Simulator sim;
     private ServiceAreaListener mServiceCallback;
     private AgentListener mAgentCallback;
+    private List<JButton> areaButtons;
+    private List<RoundButton> botsButtons;
 
     /**
      * Creates new form Visualizer
@@ -24,8 +38,21 @@ public class Visualizer extends javax.swing.JPanel {
         initComponents();
         sim = new Simulator();
         sim.init();
+        areaButtons = new ArrayList<>();
+        botsButtons = new ArrayList<>();
         this.mServiceCallback = mServiceCallback;
         this.mAgentCallback = mAgentCallback;
+        inflateAreas();
+        inflateBots();
+    }
+
+    public void run() {
+
+    }
+
+    public void iterate() {
+        sim.iteration();
+        refreshGUI();
     }
 
     /**
@@ -38,20 +65,77 @@ public class Visualizer extends javax.swing.JPanel {
     private void initComponents() {
 
         setBackground(new java.awt.Color(255, 255, 255));
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 581, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 423, Short.MAX_VALUE)
-        );
+        setLayout(null);
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
+    private void inflateAreas() {
+        Map<Integer, ServiceArea> commonsAreas = sim.getCommonsAreas();
+        for (Map.Entry<Integer, ServiceArea> entry : commonsAreas.entrySet()) {
+            ServiceArea value = entry.getValue();
+            areaButtons.add(inflateArea(value));
+        }
+        for (JButton areaButton : areaButtons) {
+            this.add(areaButton);
+        }
+    }
+
+    private JButton inflateArea(ServiceArea value) {
+        JButton area = new RoundButton(Constants.getTypeString(value.getType()));
+        area.setBackground(AREA_COLOR);
+        area.setBounds(value.getX() - value.getRatio(), value.getY() - value.getRatio(),
+                value.getRatio() * BOT_SIZE / 3, value.getRatio() * BOT_SIZE / 3);
+        area.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                mServiceCallback.serviceClick(value);
+            }
+
+        });
+        return area;
+    }
+
+    private void inflateBots() {
+        List<Agent> allBots = new ArrayList<>();
+        allBots.addAll(sim.getCommonsAreas().get(Constants.QYR).getBots());
+        allBots.addAll(sim.getCommonsAreas().get(Constants.TECHNICAL_ASSITENCE).getBots());
+        allBots.addAll(sim.getCommonsAreas().get(Constants.REQUEST).getBots());
+        for (Agent bot : allBots) {
+            botsButtons.add(inflateAgent(bot));
+        }
+        for (JButton button : botsButtons) {
+            this.add(button);
+        }
+    }
+
+    private RoundButton inflateAgent(Agent bot) {
+        RoundButton agentB = new RoundButton(bot.toString());
+        agentB.setObject(bot);
+        agentB.setBackground(BOT_COLOR);
+        agentB.setBounds(bot.getX(), bot.getY(), BOT_SIZE, BOT_SIZE);
+        agentB.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                mAgentCallback.agentClick(bot);
+            }
+
+        });
+        return agentB;
+    }
+
+    private void refreshGUI() {
+        Movable mov;
+        for (RoundButton bot : botsButtons) {
+            mov = bot.getObject();
+            bot.setLocation(mov.getPosition());
+        }
+    }
+
+    public boolean finish() {
+    return sim.finish();
+    }
+
 }

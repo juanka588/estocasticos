@@ -22,13 +22,14 @@ import java.util.Random;
  */
 public class Simulator {
 
-    public static int BOTS_NUMBER = 20;
-    public static int MAX_TIME = 100;
+    public static int BOTS_NUMBER = 10;
+    public static int MAX_TIME = 200;
     public static int RATIO = 20;
     public static final double CALL_AVG = 10.0;
     public static final double CALL_DESVIATION = 3.0;
-    public static final double LAMDA = 2;
+    public static final double LAMDA = 5;
     public static final double LEARNING_RATE = 0.01;
+
     private static Random rand = new Random();
     private static int maxID = 0;
     private Map<Integer, ServiceArea> commonsAreas;
@@ -38,6 +39,8 @@ public class Simulator {
     private Map<Integer, List<Event>> events;
     private List<Call> calls;
 
+    private int time = 0;
+
     public void init() {
         //init
         calls = new ArrayList<>();
@@ -46,7 +49,7 @@ public class Simulator {
         area2 = new ServiceArea(new ArrayList<>(), Constants.REQUEST,
                 200, 200, RATIO);
         area3 = new ServiceArea(new ArrayList<>(), Constants.TECHNICAL_ASSITENCE,
-                250, 250, RATIO);
+                100, 250, RATIO);
         commonsAreas = new HashMap<>();
         commonsAreas.put(area1.getType(), area1);
         commonsAreas.put(area2.getType(), area2);
@@ -76,42 +79,116 @@ public class Simulator {
         }
     }
 
+    public void iteration() {
+        if (finish()) {
+            System.out.println("Simulation ended");
+            return;
+        }
+        List<Event> current = events.get(time);
+        System.out.println("actual time: " + time);
+        if (current != null) {
+            //new call in
+            System.out.println("current: " + current.size());
+            addEventsToRandomQueue(current);
+        }
+        //refresh states
+
+        //check queues
+        area1.checkQueue();
+        area2.checkQueue();
+        area3.checkQueue();
+        //make progress attending calls
+        progressCalls();
+
+        //try to help into the service Area
+        area1.checkInnerHelp();
+        area2.checkInnerHelp();
+        area3.checkInnerHelp();
+
+        //try to help other areas
+        area1.checkOuterHelp(getMostBusyArea());
+        area2.checkOuterHelp(getMostBusyArea());
+        area3.checkOuterHelp(getMostBusyArea());
+
+        //move agents 
+        area1.moveAgents();
+        area2.moveAgents();
+        area3.moveAgents();
+
+        //verify visa
+        area1.checkVisitors();
+        area2.checkVisitors();
+        area3.checkVisitors();
+        time += 1;
+    }
+
     public void run() {
         // begin simulation
-        int time = 0;
-        List<Event> current;
-        while (time <= MAX_TIME) {
-            current = events.get(time);
-            System.out.println("time actual: " + time);
-            if (current != null) {
-                //new call in
-                System.out.println("current: " + current.size());
-                addEventsToRandomQueue(current);
-            }
-            //refresh states
-
-            //check queues
-            area1.checkQueue();
-            area2.checkQueue();
-            area3.checkQueue();
-            //make progress attending calls
-            progressCalls();
-            //try to help into the service Area
-            area1.checkInnerHelp();
-            area2.checkInnerHelp();
-            area3.checkInnerHelp();
-
-            //try to help other areas
-            area1.checkOuterHelp(getMostBusyArea());
-            area2.checkOuterHelp(getMostBusyArea());
-            area3.checkOuterHelp(getMostBusyArea());
-
-            //move agents 
-            area1.moveAgents();
-            area2.moveAgents();
-            area3.moveAgents();
-            time += 1;
+        while (!finish()) {
+            iteration();
         }
+    }
+
+    //statistics
+    public double getAvgCallTime() {
+        double sum = 0.0;
+        for (Call call : calls) {
+            if (call.getDuration() < 0.0) {
+                System.out.println("weird must review");
+            } else {
+                sum += call.getDuration();
+            }
+
+        }
+        return sum / calls.size();
+    }
+
+    public double getFinishCalls() {
+        int totalCalls = 0;
+        for (Call call : calls) {
+            if (call.isFinish()) {
+                totalCalls++;
+            }
+        }
+        return totalCalls;
+    }
+
+    private List<Agent> getAllBots() {
+        List<Agent> allBots = new ArrayList<>();
+        for (Map.Entry<Integer, ServiceArea> entry : commonsAreas.entrySet()) {
+            allBots.addAll(entry.getValue().getBots());
+        }
+        return allBots;
+    }
+
+    public double getAvgBusyTime() {
+        List<Agent> allBots = getAllBots();
+        double busySum = 0.0;
+        for (Agent bot : allBots) {
+            busySum += bot.getBusyTime() / (double) time;
+        }
+        return busySum / allBots.size();
+    }
+
+    public double getAvgFreeTime() {
+        List<Agent> allBots = getAllBots();
+        double freeSum = 0.0;
+        for (Agent bot : allBots) {
+            freeSum += bot.getFreeTime() / (double) time;
+        }
+        return freeSum / allBots.size();
+    }
+
+    public Map<Integer, ServiceArea> getCommonsAreas() {
+        return commonsAreas;
+    }
+
+    public Map<Integer, List<Event>> getEvents() {
+        return events;
+    }
+
+    public List<Call> getCalls() {
+        return calls;
     }
 
     private static List<Agent> generateBots(int size, ServiceArea area, Map<Integer, ServiceArea> common) {
@@ -170,13 +247,13 @@ public class Simulator {
             rand2 = rand.nextInt(3);
             switch (rand2) {
                 case 0:
-                    area1.getPendingCalls().add(evt.getCall());
+                    area1.add(evt.getCall());
                     break;
                 case 1:
-                    area2.getPendingCalls().add(evt.getCall());
+                    area2.add(evt.getCall());
                     break;
                 case 2:
-                    area3.getPendingCalls().add(evt.getCall());
+                    area3.add(evt.getCall());
                     break;
             }
         }
@@ -191,7 +268,19 @@ public class Simulator {
     }
 
     private ServiceArea getMostBusyArea() {
-        //TODO: check
-        return area1;
+        int max = 0;
+        ServiceArea busyArea = null, temp;
+        for (Map.Entry<Integer, ServiceArea> entry : commonsAreas.entrySet()) {
+            temp = entry.getValue();
+            if (temp.getPendingCalls().size() > max) {
+                max = temp.getPendingCalls().size();
+                busyArea = temp;
+            }
+        }
+        return busyArea;
+    }
+
+    public boolean finish() {
+        return time > MAX_TIME;
     }
 }

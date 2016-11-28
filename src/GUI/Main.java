@@ -10,7 +10,6 @@ import Data.ServiceArea;
 import java.awt.CardLayout;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 /**
@@ -45,6 +44,7 @@ public class Main extends javax.swing.JFrame implements ServiceAreaListener, Age
         speedSelector = new javax.swing.JSlider();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
+        newButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Call Center Simulator");
@@ -103,6 +103,13 @@ public class Main extends javax.swing.JFrame implements ServiceAreaListener, Age
         jLabel3.setVerticalAlignment(javax.swing.SwingConstants.TOP);
         jLabel3.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
+        newButton.setText("New");
+        newButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                newButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -112,9 +119,12 @@ public class Main extends javax.swing.JFrame implements ServiceAreaListener, Age
                 .addComponent(visu, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(StepButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(RunButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(StepButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(RunButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(18, 18, 18)
+                        .addComponent(newButton, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(detailsContainer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1)
                     .addComponent(jLabel2)
@@ -130,7 +140,9 @@ public class Main extends javax.swing.JFrame implements ServiceAreaListener, Age
                 .addGap(24, 24, 24)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(StepButton)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(StepButton)
+                            .addComponent(newButton))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(RunButton)
                         .addGap(40, 40, 40)
@@ -163,18 +175,34 @@ public class Main extends javax.swing.JFrame implements ServiceAreaListener, Age
                     while (!visu.finish()) {
                         visu.iterate();
                         try {
-                            Thread.sleep(50);
+                            int val = speedSelector.getValue();
+                            if (val == 0) {
+                                val = 1;
+                            }
+                            Thread.sleep(1000 / val);
                         } catch (InterruptedException ex) {
                             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                         }
                         Main.this.pack();
                     }
                     tSim = null;
+                    RunButton.setText("Run");
                 }
             });
             tSim.start();
+            RunButton.setText("Pause");
+        } else {
+            tSim.stop();
+            tSim = null;
+            RunButton.setText("Run");
         }
     }//GEN-LAST:event_RunButtonActionPerformed
+
+    private void newButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newButtonActionPerformed
+        this.getContentPane().removeAll();
+        initComponents();
+        this.pack();
+    }//GEN-LAST:event_newButtonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -218,6 +246,7 @@ public class Main extends javax.swing.JFrame implements ServiceAreaListener, Age
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JButton newButton;
     private javax.swing.JSlider speedSelector;
     private Visualizer visu;
     // End of variables declaration//GEN-END:variables

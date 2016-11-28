@@ -22,12 +22,12 @@ import java.util.Random;
  */
 public class Simulator {
 
-    public static int BOTS_NUMBER = 10;
+    public static int BOTS_NUMBER = 20;
     public static int MAX_TIME = 200;
     public static int RATIO = 20;
     public static final double CALL_AVG = 10.0;
     public static final double CALL_DESVIATION = 3.0;
-    public static final double LAMDA = 5;
+    public static final double LAMDA = 3;
     public static final double LEARNING_RATE = 0.01;
 
     private static Random rand = new Random();

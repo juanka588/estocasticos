@@ -8,7 +8,6 @@ package GUI;
 import Data.Agent;
 import Data.ServiceArea;
 import java.awt.CardLayout;
-import java.awt.Color;
 import java.awt.FlowLayout;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -230,12 +229,9 @@ public class Main extends javax.swing.JFrame implements ServiceAreaListener, Age
     }//GEN-LAST:event_newButtonActionPerformed
 
     private void seeCallsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_seeCallsActionPerformed
-        JFrame frame = new JFrame("Calls");
-        frame.getContentPane().add(((Visualizer) visu).getCalls());
-        frame.getContentPane().setLayout(new FlowLayout());
-        frame.setSize(400, 400);
+        JFrame frame = ((Visualizer) visu).getCalls();
+        frame.setSize(new java.awt.Dimension(560, 367));
         frame.setVisible(true);
-        frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
     }//GEN-LAST:event_seeCallsActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed

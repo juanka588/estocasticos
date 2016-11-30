@@ -11,8 +11,8 @@ import static Data.Constants.AREA_COLOR;
 import static Data.Constants.BOT_COLOR;
 import static Data.Constants.BOT_SIZE;
 import Data.ServiceArea;
+import Data.Statistics;
 import LN.Simulator;
-import java.awt.PopupMenu;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -21,6 +21,19 @@ import java.util.Map;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.category.BarRenderer;
+import org.jfree.chart.renderer.category.CategoryItemRenderer;
+import org.jfree.chart.renderer.xy.XYBarRenderer;
+import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.data.statistics.HistogramDataset;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
 
 /**
  *
@@ -141,8 +154,25 @@ public class Visualizer extends javax.swing.JPanel {
         return new StatsPanel(sim.getStats());
     }
 
-    public JPanel getCalls() {
-        return new CallsPanel(sim.getCalls());
+    public JFrame getCalls() {
+        return new LineChart_AWT("calls", "calls ended", makeChartPanel());
+    }
+
+    private ChartPanel makeChartPanel() {
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+        dataset.addValue(sim.getFinishCalls(), "Llamadas finalizadas", "number");
+        dataset.addValue(sim.getCalls().size() - sim.getFinishCalls(), "Llamadas pendientes", "number");
+        dataset.addValue(sim.getCalls().size(), "Llamadas Totales", "number");
+        JFreeChart chart = ChartFactory.createBarChart("Calls",
+                "Category",
+                "Frequency",
+                dataset,
+                PlotOrientation.VERTICAL,
+                true, true, false);
+        CategoryPlot categoryPlot = chart.getCategoryPlot();
+        BarRenderer renderer = (BarRenderer) categoryPlot.getRenderer();
+        renderer.setMaximumBarWidth(.35); // set maximum width to 35% of chart
+        return new ChartPanel(chart);
     }
 
 }

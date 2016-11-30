@@ -8,8 +8,11 @@ package GUI;
 import Data.Agent;
 import Data.ServiceArea;
 import java.awt.CardLayout;
+import java.awt.Color;
+import java.awt.FlowLayout;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 /**
@@ -45,6 +48,8 @@ public class Main extends javax.swing.JFrame implements ServiceAreaListener, Age
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         newButton = new javax.swing.JButton();
+        seeCalls = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Call Center Simulator");
@@ -110,6 +115,20 @@ public class Main extends javax.swing.JFrame implements ServiceAreaListener, Age
             }
         });
 
+        seeCalls.setText("Ver llamadas");
+        seeCalls.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                seeCallsActionPerformed(evt);
+            }
+        });
+
+        jButton2.setText("estadisticas");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -124,14 +143,16 @@ public class Main extends javax.swing.JFrame implements ServiceAreaListener, Age
                             .addComponent(StepButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(RunButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(18, 18, 18)
-                        .addComponent(newButton, javax.swing.GroupLayout.PREFERRED_SIZE, 68, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(seeCalls, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(newButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addComponent(detailsContainer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1)
                     .addComponent(jLabel2)
-                    .addComponent(speedSelector, javax.swing.GroupLayout.PREFERRED_SIZE, 232, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(47, 47, 47)
-                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(jButton2)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 222, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(speedSelector, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 232, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(41, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -144,13 +165,17 @@ public class Main extends javax.swing.JFrame implements ServiceAreaListener, Age
                             .addComponent(StepButton)
                             .addComponent(newButton))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(RunButton)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(RunButton)
+                            .addComponent(seeCalls))
                         .addGap(40, 40, 40)
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(speedSelector, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel3)
+                        .addGap(27, 27, 27)
+                        .addComponent(jButton2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -163,7 +188,7 @@ public class Main extends javax.swing.JFrame implements ServiceAreaListener, Age
     }// </editor-fold>//GEN-END:initComponents
 
     private void StepButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_StepButtonActionPerformed
-        visu.iterate();
+        ((Visualizer) visu).iterate();
         this.pack();
     }//GEN-LAST:event_StepButtonActionPerformed
 
@@ -172,8 +197,8 @@ public class Main extends javax.swing.JFrame implements ServiceAreaListener, Age
             tSim = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    while (!visu.finish()) {
-                        visu.iterate();
+                    while (!((Visualizer) visu).finish()) {
+                        ((Visualizer) visu).iterate();
                         try {
                             int val = speedSelector.getValue();
                             if (val == 0) {
@@ -203,6 +228,24 @@ public class Main extends javax.swing.JFrame implements ServiceAreaListener, Age
         initComponents();
         this.pack();
     }//GEN-LAST:event_newButtonActionPerformed
+
+    private void seeCallsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_seeCallsActionPerformed
+        JFrame frame = new JFrame("Calls");
+        frame.getContentPane().add(((Visualizer) visu).getCalls());
+        frame.getContentPane().setLayout(new FlowLayout());
+        frame.setSize(400, 400);
+        frame.setVisible(true);
+        frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+    }//GEN-LAST:event_seeCallsActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        JFrame frame = new JFrame("Stats");
+        frame.getContentPane().add(((Visualizer) visu).getStats());
+        frame.getContentPane().setLayout(new FlowLayout());
+        frame.setSize(500, 100);
+        frame.setVisible(true);
+        frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -243,12 +286,14 @@ public class Main extends javax.swing.JFrame implements ServiceAreaListener, Age
     private javax.swing.JButton RunButton;
     private javax.swing.JButton StepButton;
     private javax.swing.JPanel detailsContainer;
+    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JButton newButton;
+    private javax.swing.JButton seeCalls;
     private javax.swing.JSlider speedSelector;
-    private Visualizer visu;
+    private javax.swing.JPanel visu;
     // End of variables declaration//GEN-END:variables
 
     @Override

@@ -96,7 +96,7 @@ public class Call {
             }
             //remove helping agents
             for (Agent agent : allocatedAgents) {
-                if (agent.getState() == Agent.HELPING) {
+                if (agent.getState() == Agent.INNER_HELP) {
                     agent.startMoving(agent.getOrigin());
                 } else {
                     agent.setState(Agent.FREE);

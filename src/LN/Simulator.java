@@ -10,6 +10,7 @@ import Data.Call;
 import Data.Constants;
 import Data.Event;
 import Data.ServiceArea;
+import Data.Statistics;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,11 +39,13 @@ public class Simulator {
     private ServiceArea area3;
     private Map<Integer, List<Event>> events;
     private List<Call> calls;
+    private List<Statistics> stats;
 
     private int time = 0;
 
     public void init() {
         //init
+        stats = new ArrayList<>();
         calls = new ArrayList<>();
         area1 = new ServiceArea(new ArrayList<>(), Constants.QYR,
                 100, 100, RATIO);
@@ -120,6 +123,11 @@ public class Simulator {
         area2.checkVisitors();
         area3.checkVisitors();
         time += 1;
+        stats.add(new Statistics(getAvgCallTime(), getFinishCalls(), getAvgBusyTime(), getAvgFreeTime()));
+    }
+
+    public List<Statistics> getStats() {
+        return stats;
     }
 
     public void run() {

@@ -12,12 +12,15 @@ import static Data.Constants.BOT_COLOR;
 import static Data.Constants.BOT_SIZE;
 import Data.ServiceArea;
 import LN.Simulator;
+import java.awt.PopupMenu;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 /**
  *
@@ -44,10 +47,6 @@ public class Visualizer extends javax.swing.JPanel {
         this.mAgentCallback = mAgentCallback;
         inflateAreas();
         inflateBots();
-    }
-
-    public void run() {
-
     }
 
     public void iterate() {
@@ -135,7 +134,15 @@ public class Visualizer extends javax.swing.JPanel {
     }
 
     public boolean finish() {
-    return sim.finish();
+        return sim.finish();
+    }
+
+    public JPanel getStats() {
+        return new StatsPanel(sim.getStats());
+    }
+
+    public JPanel getCalls() {
+        return new CallsPanel(sim.getCalls());
     }
 
 }

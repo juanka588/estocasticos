@@ -15,7 +15,7 @@ import java.util.Map;
  */
 public class Agent implements Movable {
 
-    public static final int BUSY = 101, FREE = 102, HELPING = 103;
+    public static final int BUSY = 101, FREE = 102, INNER_HELP = 103, OUTER_HELP = 104;
     private Map<Integer, Double> expertices;
     private ServiceArea origin;
     private Map<Integer, ServiceArea> commonAreas;
@@ -147,7 +147,7 @@ public class Agent implements Movable {
     public void startMoving(ServiceArea mostBusy) {
         moving = true;
         dest = mostBusy;
-        state = HELPING;
+        state = INNER_HELP;
     }
 
     public ServiceArea getDest() {
@@ -165,7 +165,6 @@ public class Agent implements Movable {
     public int getFreeTime() {
         return freeTime;
     }
-    
 
     public void move() {
         boolean arrive = true;
@@ -201,7 +200,6 @@ public class Agent implements Movable {
             if (arrive) {
                 //finally arrived
                 moving = false;
-                state = Agent.FREE;
                 if (dest.getPendingCalls().isEmpty()) {
                     //teletransport
                     startMoving(origin);
@@ -233,8 +231,11 @@ public class Agent implements Movable {
             case BUSY:
                 stateS = "Busy";
                 break;
-            case HELPING:
-                stateS = "Helping";
+            case INNER_HELP:
+                stateS = "Inner Help";
+                break;
+            case OUTER_HELP:
+                stateS = "Helping others";
                 break;
         }
         return stateS;

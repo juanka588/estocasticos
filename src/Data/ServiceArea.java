@@ -113,7 +113,7 @@ public class ServiceArea implements Movable {
                     temp = getRandomElement(busys);
                     if (temp.getCurrentCall() != null) {
                         bot.allocateService(temp.getCurrentCall());
-                        bot.setState(Agent.HELPING);
+                        bot.setState(Agent.INNER_HELP);
                     }
                 }
             }
@@ -128,7 +128,7 @@ public class ServiceArea implements Movable {
         for (Agent bot : getFreeAgents()) {
             boolean help = makeDecision();
             if (help) {
-                bot.setState(Agent.HELPING);
+                bot.setState(Agent.INNER_HELP);
                 bot.startMoving(mostBusy);
                 visitors.add(bot);
             }
